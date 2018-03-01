@@ -1,0 +1,136 @@
+#Load Data/Set up Working Directory
+```{r}
+#setwd("C:/Users/Gaby/Desktop/sdNVP_Simulations/Data")
+Data <- read.table("../Data/PalmerDataGroup1.csv",sep=",",header=TRUE,row.names=1)
+
+```
+
+#Functions
+```{r}
+#This is a subset for the simdata
+#Argument Example: (Dataframe, 1, "AAC")
+
+pat_subset_Codon <- function(SimDF, pat, codon){
+
+newsub <- subset(SimDF, Pat== pat & Codon==codon,select=c(Months, SimFrequency, Cost)) 
+
+return(newsub)   
+}
+##########################################################
+
+#This subset for the real data
+pat_subset_real <- function(Data, pat, codon){
+
+newsub <- Data$Res.Mut.Precentage[which(Data$Codon==codon&Data$Pat==pat)]
+
+return(newsub)   
+}
+#########################################################
+
+simfreq_pat <- function(subpat,num){
+
+simfreq <- subpat$SimFrequency[which(subpat$Cost==num)] 
+
+return(simfreq)   
+}
+#########################################################
+#This function calculates the ssd
+
+ssd<- function(realpat,simpat){
+
+dsqr <- sum((realpat - simpat)^2)
+  
+return(dsqr)   
+}
+```
+
+```{r}
+SimData <- read.table("../Data/SimDF_Palmer.csv",sep=",",header=TRUE,row.names=1)
+subpat=pat_subset_Codon(SimData,pat,codon)#This uses my subsetting function to     get the simulated months,simfreq and cost of the current patient
+    
+realpat=pat_subset_real(Data,pat,codon)#This uses my subsetting function to       get the real data's freq for the current patient
+    
+```
+
+#This is an example for subsetting
+```{r}
+#Example AAC
+simpat1=pat_subset_Codon(SimData,1,"AAT")
+simpat1AAC=pat_subset_Codon(SimData,1,"AAC")
+
+simpat1sub= simfreq_pat(simpat1,0.01)
+simpat1subAAC= simfreq_pat(simpat1AAC,0.1)
+
+realpat1=pat_subset_real(Data,1,"AAT")
+realpat1AAC=pat_subset_real(Data,1,"AAC")
+
+
+```
+
+
+
+```{r}
+
+Pat <- unique(Data$Pat) #List of Patients
+costlist <- unique(SimData$Cost) #List of cost
+codonlist <- as.character(unique(Data$Codon)) #List of codon
+
+numRowNeeded <- length(unique(Data$Pat))*length(costlist)*length(codonlist) #This caluclates the number of rows needed for my DF
+
+#Creates DF
+EstCost_DF = data.frame(Pat= rep(0,numRowNeeded), Cost= 0, SSD= 0, Codon= "",stringsAsFactors = FALSE)
+
+
+for (i in 1:length(Pat)){
+  for(j in 1:length(codonlist)){ 
+      for(k in 1:length(costlist)){
+    pat = patlist[i] 
+    codon= codonlist[j] 
+    cost= costlist[k]
+    
+    simpat=pat_subset_Codon(SimData,pat,codon) #This subset the sim by codon
+    realpat=pat_subset_real(Data,pat,codon) #This subset the real data by codon
+    
+    simpatsub= simfreq_pat(simpat,cost) #This subset the simpatsub based on cost
+    
+    SSD=ssd(realpat,simpatsub) #This calculates the ssd
+  
+    StartRow <- min(which(EstCost_DF$Pat== 0))
+      
+      EstCost_DF$Pat[StartRow] <- pat
+  
+      EstCost_DF$Cost[StartRow]<- cost
+      
+      EstCost_DF$SSD[StartRow]<- SSD
+      
+      EstCost_DF$Codon[StartRow] <- codon
+      }
+    }
+  } 
+
+```
+
+
+#This creates the SSD Plots
+```{r}
+pdf("../Plots/Palmer_SSD/SSD_Plot_8.pdf",width = 10, height =10)
+for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
+  for(j in 1:length(codonlist)){ #Going through the list of codon (3)
+    pat = patlist[i] #saving the current patient in pat
+    codon= codonlist[j] #saving the current codon 
+    
+    ssd_pat <- subset(EstCost_DF, Pat== pat, select = c(Pat, SSD, Cost, Codon))
+
+    ssd_pat_Codon <- subset(ssd_pat, Codon== codon, select = c(Pat, SSD, Cost, Codon))
+    
+         
+plot(log(ssd_pat_Codon$Cost), ssd_pat_Codon$SSD, type= "p", col= "black", main=paste("Pat",patlist[i],"Codon",codonlist[j], "SSD"), xlab="Cost", ylab= "SSD", xaxt="n",lwd = 5, pch= 12)
+
+axis(1,labels = costlist, at = c(log(costlist)),las=1)
+  
+     }
+      
+  }
+
+dev.off()
+```

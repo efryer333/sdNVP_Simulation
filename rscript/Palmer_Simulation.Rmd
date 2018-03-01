@@ -1,0 +1,136 @@
+#Load Data/Set up Working Directory
+```{r}
+
+setwd("C:/Users/Gaby/Desktop/sdNVP_Simulations/Data") #Gabriella's WD
+Data <- read.table("../Data/PalmerDataGroup1.csv",sep=",",header=TRUE,row.names=1)
+
+```
+
+#Simulation Function
+```{r}
+Sim_Fun <- function(months, startfreq, cost){ #months has three number, 
+  
+No=100000  # Number of Individuals
+u=1/No     # Mutation rate
+cost= cost # fitness cost
+bm=1-cost  # mutant cost
+bw=1       # wildtype cost
+mut= 1000 * startfreq[1] # The start number of mutants
+wt= No-mut # number of wt
+
+#The storages usage:
+    #mut stores the mut-array
+    mutStorage=c() 
+    #This stores the total number of wild type array
+    wtStorage=c()
+    #This stores new mutants
+    newmutStorage= c()
+    #This stores new wt
+    newWTStorage= c()
+    #Sim Storage for three month timepoint
+    SimStorage= c()
+
+gen1= months[1]*30 #start of the month point
+gen2= months[2]*30 #mid month point
+gen3= months[3]*30 #end mmoth point
+
+for (gen in gen1:gen3){
+  
+if (gen== gen1){
+  month1 = (mut/No)*100
+}
+if (gen== gen2){
+  month2 = (mut/No)*100
+}  
+if (gen== gen3){
+  month3 = (mut/No)*100
+}  
+
+#To see if any wt changed to mutants    
+newmut=rbinom(1,wt,u) 
+newmutStorage= append(newmutStorage, newmut)
+wt=wt-newmut 
+mut= mut + newmut 
+
+#To see if any mutants changed to wt
+newwt=rbinom(1,mut,u) 
+newWTStorage= append(newWTStorage, newwt)
+wt=wt+newwt 
+mut=mut- newwt
+
+#Binomial Sampling
+#p is the expected fraction of mutants for the next generation
+P=(mut*bm)/((mut*bm)+ (wt*bw))
+mut= rbinom(1,No,P)          
+wt= No-mut
+
+#Storing the new WT and Mut Values
+wtStorage= append(wtStorage, wt)
+mutStorage= append(mutStorage, mut)
+}
+
+SimStorage= append(SimStorage, month1)
+SimStorage= append(SimStorage, month2)
+SimStorage= append(SimStorage, month3)
+
+
+
+  return(SimStorage)
+}
+```
+
+#Nested Loop
+```{r}
+
+costlist <- 10^seq(-5,-1, by=0.5) #List of cost//
+
+codonlist <- as.character(unique(Data$Codon)) #List of codon
+patlist <- unique(Data$Pat) #List of patients
+
+#number of rows needed for DF
+numRowNeeded <- length(unique(Data$Pat))*length(costlist)*length(codonlist)*3
+
+#Creates DF
+SimDF = data.frame(Pat= rep(0,numRowNeeded), Months=0, SimFrequency = 0, ResMut= "", Cost= 0,Codon= "",stringsAsFactors = FALSE)
+
+
+#This is the outer most loop (goes through patient list 1:6)
+  for(i in 1:length(patlist)){
+    #Middle loop: goes through the codon list (3)
+    for(j in 1:length(codonlist)){
+        #This goes through the cost list and adds data in the DF
+        for(k in 1:length(costlist)){
+    pat=patlist[i] #Goes into the patlist
+  
+    codon = codonlist[j] #Goes into the codonlist
+    #in data(df) it is looking for which pat = patlist[i] and codon[j]
+    freq<- Data$Res.Mut.Precentage[which(Data$Pat==pat&Data$Codon==codon)] 
+    #it is looking in months of data(df) finding which pat = pat[i]
+    months<- unique(Data$Month[which(Data$Pat==pat)])
+    
+      cost=costlist[k]
+      #Finds the start row of the empty DF row
+      StartRow <- min(which(SimDF$Pat== 0))
+      #fills pat data
+      SimDF$Pat[StartRow:(StartRow +2)] <- rep(pat, 3)
+      #fills months data
+      SimDF$Months[StartRow:(StartRow +2)] <- c(months[1], months[2], months[3])
+      
+      #fills in the res type
+      if(codon=="AAC"||codon=="AAT"){
+      SimDF$ResMut[StartRow:(StartRow +2)] <- rep("K103N",3)  
+      }
+      if(codon=="TGT"){
+      SimDF$ResMut[StartRow:(StartRow +2)] <- rep("Y181C",3)  
+      }
+      #fills in the sim data
+      SimDF$SimFrequency[StartRow: (StartRow +2)] <-Sim_Fun(months,freq,cost)
+      #fills in the cost data
+      SimDF$Cost[StartRow:(StartRow +2)]<- rep(cost,3)
+      #fills in the cost
+      SimDF$Codon[StartRow:(StartRow +2)] <- rep(codon,3)
+      }
+    }
+  }
+write.csv(SimDF, file="../Data/SimDF_Palmer.csv")
+```
