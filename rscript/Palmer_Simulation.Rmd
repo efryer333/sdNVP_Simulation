@@ -1,9 +1,10 @@
 #Load Data/Set up Working Directory
 ```{r}
-
-setwd("C:/Users/Gaby/Desktop/sdNVP_Simulations/Data") #Gabriella's WD
-Data <- read.table("../Data/PalmerDataGroup1.csv",sep=",",header=TRUE,row.names=1)
-
+getwd()
+setwd("/Users/emilyfryer/Documents/SFSU/CoDELab/sdNVP_Simulation/") #Emily's WD
+getwd()
+#setwd("C:/Users/Gaby/Documents/CoDE/sdNVP_Simulation"") #Gabriella's WD
+Data <- read.table("Data/PalmerDataGroup1.csv",sep=",",header=TRUE,row.names=1)
 ```
 
 #Simulation Function
