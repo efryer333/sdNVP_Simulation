@@ -1,15 +1,15 @@
 #Load Data/Set up Working Directory
-```{r}
+
 getwd()
 setwd("/Users/emilyfryer/Documents/SFSU/CoDELab/sdNVP_Simulation/") #Emily's WD
 getwd()
 #setwd("C:/Users/Gaby/Documents/CoDE/sdNVP_Simulation") #Gabriella's WD
 Data <- read.table("Data/PalmerDataGroup1.csv",sep=",",header=TRUE,row.names=1)
 head(Data)
-```
+
 
 #Simulation Function
-```{r}
+
 Sim_Fun <- function(months, startfreq, cost){ #months has three number, 
   
   No=100000  # Number of Individuals
@@ -79,12 +79,13 @@ Sim_Fun <- function(months, startfreq, cost){ #months has three number,
   
   return(SimStorage)
 }
-```
+
 
 #Nested Loop
-```{r}
 
-costlist <- 10^seq(-5,-1, by=0.5) #List of cost//
+
+costlist <- 10^seq(-5,-1, by=0.1) #List of cost//
+length(costlist)
 
 codonlist <- as.character(unique(Data$Codon)) #List of codon
 patlist <- unique(Data$Pat) #List of patients
@@ -134,5 +135,5 @@ for(i in 1:length(patlist)){
     }
   }
 }
-write.csv(SimDF, file="../Data/SimDF_Palmer.csv")
-```
+write.csv(SimDF, file="Data/SimDF_Palmer.csv")
+

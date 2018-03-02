@@ -133,5 +133,5 @@ SimDF = data.frame(Pat= rep(0,numRowNeeded), Months=0, SimFrequency = 0, ResMut=
       }
     }
   }
-write.csv(SimDF, file="../Data/SimDF_Palmer.csv")
+write.csv(SimDF, file="Data/SimDF_Palmer.csv")
 ```
