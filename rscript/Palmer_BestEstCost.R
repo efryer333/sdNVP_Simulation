@@ -14,10 +14,14 @@ for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
     codon= codonlist[j] #saving the current codon 
     
     ssd_pat <- subset(EstCost_DF, Pat== pat, select = c(Pat, SSD, Cost, Codon))
+    head(ssd_pat)
     
     ssd_pat_Codon <- subset(ssd_pat, Codon== codon, select = c(Pat, SSD, Cost, Codon)) 
+    head(ssd_pat_Codon)
+    
     index= which.min(ssd_pat_Codon$SSD) #This find the smallest ssd, the lower the ssd the, better the fit is
     BestCost= append(BestCost, ssd_pat_Codon$Cost[index])
+    
     
   }
 }
@@ -30,6 +34,9 @@ axis(1,labels = codonlist, at = c(1, 2, 3),las=1)
 
 library(ggplot2)
 #pdf("../Plots/Palmer_SummaryPlot/patsum2.pdf",width = 10, height =10)
-ggplot(data.frame(x=BestCodon, y=log(BestCost)), aes(BestCodon, log(BestCost), colour = BestCodon)) + geom_point(size = 2) + geom_count()+ggtitle("Estimate the Fitness Cost of K103N and Y181C") +
+BestCost_plot = ggplot(data.frame(x=BestCodon, y=log(BestCost)), aes(BestCodon, log(BestCost), colour = BestCodon)) 
+BestCost_plot + geom_point()  + geom_count() + ggtitle("Estimate the Fitness Cost of K103N and Y181C") +
   xlab("Codon") + ylab("Percentage of Fitness Cost")
-#dev.off()
+  #dev.off()
+
+
