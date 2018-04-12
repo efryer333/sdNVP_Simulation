@@ -1,8 +1,8 @@
 #Load Data/Set up Working Directory
 
-getwd()
+#getwd()
 setwd("/Users/emilyfryer/Documents/SFSU/CoDELab/sdNVP_Simulation/") #Emily's WD
-getwd()
+
 #setwd("C:/Users/Gaby/Documents/CoDE/sdNVP_Simulation") #Gabriella's WD
 Data <- read.table("Data/PalmerDataGroup1.csv",sep=",",header=TRUE,row.names=1)
 head(Data)
@@ -84,7 +84,7 @@ Sim_Fun <- function(months, startfreq, cost){ #months has three number,
 #Nested Loop
 
 
-costlist <- 10^seq(-5,-1, by=0.1) #List of cost//
+costlist <- 10^seq(-5,0, by=0.1) #List of cost//
 length(costlist)
 
 codonlist <- as.character(unique(Data$Codon)) #List of codon
