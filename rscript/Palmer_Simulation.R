@@ -10,14 +10,16 @@ head(Data)
 
 #Simulation Function
 
-Sim_Fun <- function(months, startfreq, cost){ #months has three number, 
+Sim_Fun <- function(months, startfreq, cost){ 
+  #There are 3 parameters to pass into the Sim_Fun function when it is called: months, startfreq and cost
+  #Months is a vector of three values
   
   No=100000  # Number of Individuals
   u=1/No     # Mutation rate
   cost= cost # fitness cost
-  bm=1-cost  # mutant cost
-  bw=1       # wildtype cost
-  mut= 1000 * startfreq[1] # The start number of mutants
+  bm=1-cost  # mutant fitness
+  bw=1       # wildtype fitness
+  mut= 1000 * startfreq[1] # The start number of mutants .... looks like frequency but actually percentage .... change to mulitply by .01 instead of 1000
   wt= No-mut # number of wt
   
   #The storages usage:
@@ -32,14 +34,14 @@ Sim_Fun <- function(months, startfreq, cost){ #months has three number,
   #Sim Storage for three month timepoint
   SimStorage= c()
   
-  gen1= months[1]*30 #start of the month point
-  gen2= months[2]*30 #mid month point
-  gen3= months[3]*30 #end mmoth point
+  gen1= months[1]*30 #start of the month point ... HIV regeneration time is 1 day ... multiplied to get scale in days
+  gen2= months[2]*30 #mid test point
+  gen3= months[3]*30 #last test point
   
   for (gen in gen1:gen3){
     
     if (gen== gen1){
-      month1 = (mut/No)*100
+      month1 = (mut/No)*100 #Generation is a day ... and we're storing the number of mutants into a variable called month1
     }
     if (gen== gen2){
       month2 = (mut/No)*100
@@ -50,7 +52,7 @@ Sim_Fun <- function(months, startfreq, cost){ #months has three number,
     
     #To see if any wt changed to mutants    
     newmut=rbinom(1,wt,u) 
-    newmutStorage= append(newmutStorage, newmut)
+    newmutStorage = append(newmutStorage, newmut)
     wt=wt-newmut 
     mut= mut + newmut 
     
@@ -62,7 +64,7 @@ Sim_Fun <- function(months, startfreq, cost){ #months has three number,
     
     #Binomial Sampling
     #p is the expected fraction of mutants for the next generation
-    P=(mut*bm)/((mut*bm)+ (wt*bw))
+    P=(mut*bm)/((mut*bm) + (wt*bw))
     mut= rbinom(1,No,P)          
     wt= No-mut
     
@@ -84,7 +86,7 @@ Sim_Fun <- function(months, startfreq, cost){ #months has three number,
 #Nested Loop
 
 
-costlist <- 10^seq(-5,0, by=0.1) #List of cost//
+costlist <- 10^seq(-2, -1, by=0.05) #List of cost//
 length(costlist)
 
 codonlist <- as.character(unique(Data$Codon)) #List of codon
@@ -104,7 +106,7 @@ for(i in 1:length(patlist)){
     #This goes through the cost list and adds data in the DF
     for(k in 1:length(costlist)){
       pat=patlist[i] #Goes into the patlist
-      
+  
       codon = codonlist[j] #Goes into the codonlist
       #in data(df) it is looking for which pat = patlist[i] and codon[j]
       freq<- Data$Res.Mut.Precentage[which(Data$Pat==pat&Data$Codon==codon)] 
@@ -136,4 +138,5 @@ for(i in 1:length(patlist)){
   }
 }
 write.csv(SimDF, file="Data/SimDF_Palmer.csv")
+
 
