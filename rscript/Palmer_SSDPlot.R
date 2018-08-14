@@ -1,6 +1,6 @@
 #Load Data/Set up Working Directory
 #setwd("C:/Users/Gaby/Desktop/sdNVP_Simulations/Data")
-#setwd("/Users/emilyfryer/Documents/SFSU/CoDELab/sdNVP_Simulation/")
+setwd("/Users/emilyfryer/Documents/SFSU/CoDELab/sdNVP_Simulation/")
 # Does the line of code below need to be here? It already exists in Palmer_Simulation.
 #Data <- read.table("../Data/PalmerDataGroup1.csv",sep=",",header=TRUE,row.names=1)
 
@@ -113,6 +113,7 @@ for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
     
     ssd_pat <- subset(EstCost_DF, Pat== pat, select = c(Pat, SSD, Cost, Codon))
     
+    
     ssd_pat_Codon <- subset(ssd_pat, Codon== codon, select = c(Pat, SSD, Cost, Codon))
     
     
@@ -125,3 +126,4 @@ for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
 }
 
 dev.off()
+''
