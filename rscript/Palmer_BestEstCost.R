@@ -33,7 +33,7 @@ BestCodon = rep(c("AAC","AAT","TGT"), times = 6)
 library(ggplot2)
 #pdf("../Plots/Palmer_SummaryPlot/patsum2.pdf",width = 10, height =10)
 BestCost_plot = ggplot(data.frame(x=BestCodon, y=log(BestCost)), aes(BestCodon, BestCost, colour = BestCodon)) 
-BestCost_plot + geom_point(position = position_jitter(width = .3), size = 2) + ggtitle("Estimated Fitness Costs of K103N and Y181C") +
+BestCost_plot + geom_point(position = position_jitter(width = .3), size = 3) + ggtitle("Estimated Fitness Costs: K103N and Y181C") +
   xlab("Codon") + ylab("Fitness Cost") 
   #dev.off()
 
