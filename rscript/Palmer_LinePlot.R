@@ -41,7 +41,7 @@ patlist <- unique(SimData$Pat) #List of patients
 codonlist <- as.character(unique(SimData$Codon)) #List of codons
 
 
-#pdf("Plots/Palmer_LinePlot/EF_Plots.pdf",width = 10, height =10)
+pdf("Plots/Palmer_LinePlot/SACNAS_Plots.pdf",width = 6, height = 5)
 for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
   for(j in 1:length(codonlist)){ #Going through the list of codon (3)
     codon = codonlist[j] #saving the current codon 
@@ -65,16 +65,18 @@ for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
     yrange <- range(simfreq)
     
     #plot settup and addition of line for real patient data
-    plot(realpat, xlim = xrange, ylim = c(0,50) ,axes = FALSE, type= "b", col= "red", pch = 15, lwd = 2.5, main=paste("Pat",patlist[i],"Codon",codonlist[j]), xlab = "Time Point", ylab = "Frequency")
+    par(xpd=T, mar=par()$mar+c(0,0,0,3))
+    plot(realpat, xlim = xrange, ylim = c(0,30) ,axes = FALSE,type= "b", col= "red", pch = 15, lwd = 2.5, xlab = "Sampling Point (Months)", ylab = "Mutant Frequency")
     axis(1,labels = Mon, at = realpat$Month)
     axis(2)
     
     # Legend setup
-    legend('topright', # places a legend at the appropriate place
-           legend = c('Simulated data','Real Patient Data'), # puts text in the legend
+    legend(10.5, 62, # places a legend at the appropriate place 
+           legend = c('Simulation','Real Patient'), # puts text in the legend
+           xpd = TRUE, cex = .70, bty = 'n',
            lty=c(1,1), # gives the legend appropriate symbols (lines)
            lwd=c(2.5,2.5),col=c('grey','red')) # gives the legend lines color and width
-    
+    par(mar=c(5, 4, 4, 2) + 0.1)
     #Creating a range of colors for each fitness cost value
     #colors <- rainbow(ncost)
     
@@ -83,7 +85,8 @@ for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
       pat_cost = costlist[k]
       #print(costlist[k])
       subcost <- subset(subpat, pat_cost == Cost, select=c(Months, SimFrequency))
-      lines(subcost$Months, subcost$SimFrequency, lty = 1, lwd = 1.0, col = "#cccccc")
+      lines(subcost$Months, subcost$SimFrequency, lty = 1, lwd = 1.0, col = "#A9A9A9")
+      
       #axis(2, labels = costlist[k], at = subcost$SimFrequency[3], las = 2)
       
       
@@ -104,5 +107,5 @@ for(i in 1:length(patlist)){ #Going through the list of patients (1-6)
     
   
 
-#dev.off()
+dev.off()
 

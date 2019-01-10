@@ -86,7 +86,7 @@ Sim_Fun <- function(months, startfreq, cost){
 #Nested Loop
 
 
-costlist <- 10^seq(-2, -1, by=0.05) #List of cost//
+costlist <- 10^seq(-5, 0, by=0.25) #List of cost//
 length(costlist)
 
 codonlist <- as.character(unique(Data$Codon)) #List of codon
